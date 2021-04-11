@@ -31,16 +31,31 @@ let upload = multer({
     })
 })
 
-router.post('/upload', upload.array('photos', 3), function(req, res, next) {
+router.post('/upload', upload.array('photos', 10), function(req, res, next) {
     res.json({files: req.files, length: req.files.length})
     // res.send('Successfully uploaded ' + req.files + ' files!')
 })
 
-router.delete('/delete', (req, res) => {
-    
+router.patch('/update/:key', (req, res)=> {
     const params = {
         Bucket: 'assassian-bucket', 
-        Key: '1618064356089.png'
+        Key: Key
+    }
+    s3.putObject(params, function (err, data) {
+
+        if (err) {
+            callback(new InternalServerError(err));
+        } else {
+            res.json(data)
+        }
+    });
+})
+
+router.delete('/delete/:key', (req, res) => {
+    const Key = `${req.params.key}`
+    const params = {
+        Bucket: 'assassian-bucket', 
+        Key: Key
     }
     s3.deleteObject(params, (err, data)=> {
         if (err) {
